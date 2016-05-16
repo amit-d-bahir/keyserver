@@ -9,6 +9,7 @@ class KeyServer
   def initialize
     @keys = Hash.new({})
     @deleted = Set.new
+    @mutex = Mutex.new
   end
 
   # Generates a random key of length 30
@@ -46,13 +47,17 @@ class KeyServer
 
   # Returns a random key from set of all unblocked keys
   def serve_key
-    key = unblocked_keys.sample
+    key = nil
+    @mutex.synchronize do
+      key = unblocked_keys.sample
+    end
     if key.nil?
       status = 404
       body = 'No key available! Please generate some keys...'
     else
       status = 200
       body = key
+      block_key(key)
     end
     [body, status]
   end
@@ -79,8 +84,10 @@ class KeyServer
     return ['Invalid key', 404] if invalid_key?(key)
     body = 'Successfully blocked'
     body = 'Already blocked' if @keys[key]['status'] == 'blocked'
-    @keys[key]['status'] = 'blocked'
-    @keys[key]['time_stamp'] = Time.new
+    @mutex.synchronize do
+      @keys[key]['status'] = 'blocked'
+      @keys[key]['time_stamp'] = Time.new
+    end
     [body, 200]
   end
 
@@ -89,22 +96,28 @@ class KeyServer
     return ['Invalid key', 404] if invalid_key?(key)
     body = 'Successfully unblocked'
     body = 'Already unblocked' if @keys[key]['status'] == 'unblocked'
-    @keys[key]['status'] = 'unblocked'
+    @mutex.synchronize do
+      @keys[key]['status'] = 'unblocked'
+    end
     [body, 200]
   end
 
   # Deletes a generated key
   def delete_key(key)
     return ['Invalid key', 404] if invalid_key?(key)
-    @keys.delete(key)
-    @deleted.add(key)
+    @mutex.synchronize do
+      @keys.delete(key)
+      @deleted.add(key)
+    end
     ['Successfully deleted', 200]
   end
 
   # Refreshes the timestamp of the given key
   def ping_key(key)
     return ['Invalid key', 404] if invalid_key?(key)
-    @keys[key]['time_stamp'] = Time.new
+    @mutex.synchronize do
+      @keys[key]['time_stamp'] = Time.new
+    end
     ['Key time stamp refreshed', 200]
   end
 end

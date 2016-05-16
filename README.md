@@ -11,7 +11,7 @@ Write a server which can generate random api keys, assign them for usage and rel
 
 * E4. There should be an endpoint to delete a key. Deleted keys should be purged.
 
-* E5. All keys are to be kept alive by clients calling this endpoint every 5 minutes. If a particular key has not received a keep alive in last five minutes then it should be deleted and never used again. 
+* E5. All keys are to be kept alive by clients calling this endpoint every 5 minutes. If a particular key has not received a keep alive in last five minutes then it should be deleted and never used again.
 
 Apart from these endpoints, following rules should be enforced:
 
@@ -33,7 +33,7 @@ Replace :key with any of the blocked keys to unblock it.
 
 *  **/delete/:key**
 
-Replace :key with any of the keys to delete it. 
+Replace :key with any of the keys to delete it.
 
 Note: After deleting it can't be blocked.
 
@@ -62,7 +62,7 @@ Note: This is not to be exposed (Just for debugging purpose)
 
 * Start the server
 ```
-$ ruby main.rb
+$ rackup
 ```
 Follow the web server endpoints description and ping on the respective endpoints from any web client (Ex. Browser, Curl etc.)
 
