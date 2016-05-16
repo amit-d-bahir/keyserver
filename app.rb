@@ -3,6 +3,14 @@ require_relative 'keyserver'
 
 keyserver = KeyServer.new
 
+# Refresh the contents of keys every second
+Thread.new do
+  loop do
+    key_server.refresh_contents
+    sleep 1
+  end
+end
+
 get '/' do
   'Server is working'
 end

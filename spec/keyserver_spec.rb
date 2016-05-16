@@ -205,6 +205,26 @@ describe KeyServer do
       expected = [@generated_keys[0], @generated_keys[2]]
       expect(@keyserver.blocked_keys).to eq(expected)
     end
+
+    it 'can return a list not containing keys that got unblocked due to timeout' do
+      @keyserver.block_key(@generated_keys[0])
+      @keyserver.block_key(@generated_keys[1])
+      @keyserver.block_key(@generated_keys[2])
+      @keyserver.keys[@generated_keys[2]]["time_stamp"] = Time.new - 61
+      @keyserver.refresh_contents
+      expected = [@generated_keys[0], @generated_keys[1]]
+      expect(@keyserver.blocked_keys).to eq(expected)
+    end
+
+    it 'can return a list not containing keys that got deleted due to timeout' do
+      @keyserver.block_key(@generated_keys[0])
+      @keyserver.block_key(@generated_keys[1])
+      @keyserver.block_key(@generated_keys[2])
+      @keyserver.keys[@generated_keys[0]]["time_stamp"] = Time.new - 301
+      @keyserver.refresh_contents
+      expected = [@generated_keys[1], @generated_keys[2]]
+      expect(@keyserver.blocked_keys).to eq(expected)
+    end
   end
 
   describe 'KeyServer#unblocked_keys' do
@@ -227,6 +247,15 @@ describe KeyServer do
       @keyserver.block_key(@generated_keys[0])
       @keyserver.block_key(@generated_keys[1])
       @keyserver.block_key(@generated_keys[2])
+      expected = [@generated_keys[3], @generated_keys[4]]
+      expect(@keyserver.unblocked_keys).to eq(expected)
+    end
+
+    it 'can return a list not containing key that got deleted due to timeout' do
+      @keyserver.keys[@generated_keys[0]]['time_stamp'] = Time.new - 301
+      @keyserver.keys[@generated_keys[1]]['time_stamp'] = Time.new - 301
+      @keyserver.keys[@generated_keys[2]]['time_stamp'] = Time.new - 301
+      @keyserver.refresh_contents
       expected = [@generated_keys[3], @generated_keys[4]]
       expect(@keyserver.unblocked_keys).to eq(expected)
     end

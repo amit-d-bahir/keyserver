@@ -29,7 +29,6 @@ class KeyServer
 
   # Returns all the blocked keys
   def blocked_keys
-    refresh_contents
     blocked_keys = @keys.select { |_, v| v['status'] == 'blocked' }
     blocked_keys.keys
   end
@@ -41,7 +40,6 @@ class KeyServer
 
   # Returns all the deleted keys
   def deleted_keys
-    refresh_contents
     @deleted.to_a
   end
 
