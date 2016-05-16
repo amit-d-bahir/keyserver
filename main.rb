@@ -9,7 +9,7 @@ end
 
 get '/generate_keys' do
   keys = keyserver.generate_keys
-  keys.join("<br />")
+  keys.join('<br />')
 end
 
 get '/block/:key' do
@@ -31,10 +31,10 @@ get '/delete/:key' do
 end
 
 get '/showall' do
-  hash = {:blocked_keys => keyserver.blocked_keys.join('<br />'),
-          :unblocked_keys => keyserver.unblocked_keys.join('<br />'),
-          :deleted_keys => keyserver.deleted_keys.join('<br />')}
-  erb :showall, :locals => hash
+  hash = { blocked_keys: keyserver.blocked_keys.join('<br />'),
+           unblocked_keys: keyserver.unblocked_keys.join('<br />'),
+           deleted_keys: keyserver.deleted_keys.join('<br />') }
+  erb :showall, locals: hash
 end
 
 get '/ping/:key' do
@@ -44,13 +44,7 @@ get '/ping/:key' do
 end
 
 get '/serve_key' do
-  random_key = keyserver.serve_key
-  if random_key == nil
-    status 404
-    body 'No key available! Please generate few keys'
-  else
-    status 200
-    body random_key
-  end
+  b, s = keyserver.serve_key
+  status s
+  body b
 end
-

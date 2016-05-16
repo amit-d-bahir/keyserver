@@ -34,7 +34,16 @@ class KeyServer
   end
 
   def serve_key
-    unblocked_keys.sample
+    key = unblocked_keys.sample
+    key.nil? ? status = 404 : status = 200
+    if key.nil?
+      status = 404
+      body = 'No key available! Please generate some keys...'
+    else
+      status = 200
+      body = key
+    end
+    [body, status]
   end
 
   def deleted_keys
