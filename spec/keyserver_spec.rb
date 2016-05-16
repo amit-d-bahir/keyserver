@@ -42,6 +42,16 @@ describe KeyServer do
     it 'can raise a 404 for no available unblocked keys' do
       expect(@keyserver.serve_key).to eq(@no_key)
     end
+
+    it 'can serve keys parallely' do
+      generated_keys = @keyserver.generate_keys
+      keys = []
+      threads = []
+      threads << Thread.new { 7.times { keys << @keyserver.serve_key }}
+      threads.map { |t| t.join }
+      expect(keys.select { |_, v| v == 200 }.length).to eq(5)
+      expect(keys.select { |_, v| v == 404 }.length).to eq(2)
+    end
   end
 
   describe 'KeyServer#invalid_key?' do
