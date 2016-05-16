@@ -67,7 +67,9 @@ class KeyServer
       key = random_key
       key = random_key while @deleted.include?(key)
       new_keys.push(key)
-      @keys[key] = { 'time_stamp' => Time.new, 'status' => 'unblocked' }
+      @mutex.synchronize do
+        @keys[key] = { 'time_stamp' => Time.new, 'status' => 'unblocked' }
+      end
     end
     new_keys
   end
