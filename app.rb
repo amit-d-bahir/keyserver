@@ -1,13 +1,15 @@
 require 'sinatra'
 require_relative 'keyserver'
+require 'pry'
 
 keyserver = KeyServer.new
+invalid_key = 'Invalid key'
 
 # Refresh the contents of keys every second
 Thread.new do
   loop do
-    key_server.refresh_contents
     sleep 1
+    keyserver.refresh_contents
   end
 end
 
@@ -21,21 +23,33 @@ get '/generate_keys' do
 end
 
 get '/block/:key' do
-  b, s = keyserver.block_key(params['key'])
-  status s
-  body b
+  response = keyserver.block_key(params['key'])
+  if response.nil?
+    status 404
+    body invalid_key
+  else
+    body 'Successfully blocked'
+  end
 end
 
 get '/unblock/:key' do
-  b, s = keyserver.unblock_key(params['key'])
-  status s
-  body b
+  response = keyserver.unblock_key(params['key'])
+  if response.nil?
+    status 404
+    body invalid_key
+  else
+    body 'Successfully unblocked'
+  end
 end
 
 get '/delete/:key' do
-  b, s = keyserver.delete_key(params['key'])
-  status s
-  body b
+  response = keyserver.delete_key(params['key'])
+  if response.nil?
+    status 404
+    body invalid_key
+  else
+    body 'Successfully deleted'
+  end
 end
 
 get '/showall' do
@@ -46,13 +60,21 @@ get '/showall' do
 end
 
 get '/ping/:key' do
-  b, s = keyserver.ping_key(params['key'])
-  status s
-  body b
+  response = keyserver.ping_key(params['key'])
+  if response.nil?
+    status 404
+    body invalid_key
+  else
+    body 'Key timestamp refreshed'
+  end
 end
 
 get '/serve_key' do
-  b, s = keyserver.serve_key
-  status s
-  body b
+  key = keyserver.serve_key
+  if key.nil?
+    status 404
+    body 'No key available! Please generate some keys...'
+  else
+    body key
+  end
 end

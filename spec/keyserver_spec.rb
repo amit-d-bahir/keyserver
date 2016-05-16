@@ -2,7 +2,7 @@ require_relative '../keyserver.rb'
 
 describe KeyServer do
   before do
-    @invalid_key = ['Invalid key', 404]
+    @invalid_key = nil
     # A samlple invalid key of length 31
     # We can only get a key of length 30
     @sample_key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
@@ -28,14 +28,14 @@ describe KeyServer do
   describe 'KeyServer#serve_key' do
     before do
       @keyserver = KeyServer.new
-      @no_key = ['No key available! Please generate some keys...', 404]
+      @no_key = nil
     end
 
     it 'can serve a key from the unblocked keys' do
       generated_keys = @keyserver.generate_keys
       @keyserver.block_key(generated_keys[0])
-      10.times do
-        expect(@keyserver.serve_key).not_to include(generated_keys[0])
+      5.times do
+        expect(@keyserver.serve_key).not_to eq(generated_keys[0])
       end
     end
 
@@ -49,8 +49,8 @@ describe KeyServer do
       threads = []
       threads << Thread.new { 7.times { keys << @keyserver.serve_key }}
       threads.map { |t| t.join }
-      expect(keys.select { |_, v| v == 200 }.length).to eq(5)
-      expect(keys.select { |_, v| v == 404 }.length).to eq(2)
+      expect(keys.select { |k| k.nil? == false }.length).to eq(5)
+      expect(keys.select { |k| k.nil? }.length).to eq(2)
     end
   end
 
@@ -80,18 +80,10 @@ describe KeyServer do
     before do
       @keyserver = KeyServer.new
       @generated_keys = @keyserver.generate_keys
-      @successful = ['Successfully blocked', 200]
-      @already_blocked = ['Already blocked', 200]
     end
 
     it 'can block a valid unblocked key' do
-      expect(@keyserver.block_key(@generated_keys[0])).to eq(@successful)
-      expect(@keyserver.keys[@generated_keys[0]]['status']).to eq('blocked')
-    end
-
-    it 'can block an already blocked key' do
-      @keyserver.block_key(@generated_keys[0])
-      expect(@keyserver.block_key(@generated_keys[0])).to eq(@already_blocked)
+      expect(@keyserver.block_key(@generated_keys[0])).not_to eq(nil)
       expect(@keyserver.keys[@generated_keys[0]]['status']).to eq('blocked')
     end
 
@@ -104,17 +96,12 @@ describe KeyServer do
     before do
       @keyserver = KeyServer.new
       @generated_keys = @keyserver.generate_keys
-      @successful = ['Successfully unblocked', 200]
-      @already_unblocked = ['Already unblocked', 200]
+      @successful = 'unblocked'
     end
 
     it 'can unblock a blocked key' do
       @keyserver.block_key(@generated_keys[0])
       expect(@keyserver.unblock_key(@generated_keys[0])).to eq(@successful)
-    end
-
-    it 'can unblock an unblocked key' do
-      expect(@keyserver.unblock_key(@generated_keys[0])).to eq(@already_unblocked)
     end
 
     it 'can raise a 404 for an invalid key' do
@@ -126,16 +113,15 @@ describe KeyServer do
     before do
       @keyserver = KeyServer.new
       @generated_keys = @keyserver.generate_keys
-      @successful = ['Successfully deleted', 200]
     end
 
     it 'can delete a blocked key' do
       @keyserver.block_key(@generated_keys[0])
-      expect(@keyserver.delete_key(@generated_keys[0])).to eq(@successful)
+      expect(@keyserver.delete_key(@generated_keys[0])).not_to eq(nil)
     end
 
     it 'can delete an unblocked key' do
-      expect(@keyserver.delete_key(@generated_keys[0])).to eq(@successful)
+      expect(@keyserver.delete_key(@generated_keys[0])).not_to eq(nil)
     end
 
     it 'can raise a 404 for an invalid key' do
