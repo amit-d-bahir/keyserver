@@ -56,19 +56,26 @@ Returns all the currently blocked keys, unblocked keys and the deleted keys
 
 Note: This is not to be exposed (Just for debugging purpose)
 
+## Installation
 
+Installing all the  required dependencies
+
+```
+$ bundle install
+```
 
 ## How to run?
 
-* Start the server
+Start the server
 ```
-$ rackup
+$ rackup -p <required port>
 ```
+
 Follow the web server endpoints description and ping on the respective endpoints from any web client (Ex. Browser, Curl etc.)
+Endpoints will be served on `http://localhost:port/`
 
 ## How to run tests?
 
 ```
-$ bundle install
 $ bundle exec rspec --format documentation --color
 ```
