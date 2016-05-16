@@ -62,7 +62,13 @@ Note: This is not to be exposed (Just for debugging purpose)
 
 * Start the server
 ```
-ruby main.rb
+$ ruby main.rb
 ```
 Follow the web server endpoints description and ping on the respective endpoints from any web client (Ex. Browser, Curl etc.)
 
+## How to run tests?
+
+```
+$ bundle install
+$ bundle exec rspec --format documentation --color
+```
