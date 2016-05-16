@@ -2,10 +2,10 @@ require_relative '../keyserver.rb'
 
 describe KeyServer do
   before do
-      @invalid_key = ['Invalid key', 404]
-      # A samlple invalid key of length 31
-      # We can only get a key of length 30
-      @sample_key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    @invalid_key = ['Invalid key', 404]
+    # A samlple invalid key of length 31
+    # We can only get a key of length 30
+    @sample_key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
   end
 
   describe 'KeyServer#random_key' do
@@ -57,12 +57,12 @@ describe KeyServer do
     end
 
     it 'can identify an invalid key' do
-        expect(@keyserver.invalid_key?(@sample_key)).to eq(true)
+      expect(@keyserver.invalid_key?(@sample_key)).to eq(true)
     end
 
     it 'can return true for deleted keys' do
-        @keyserver.delete_key(@generated_keys[0])
-        expect(@keyserver.invalid_key?(@generated_keys[0])).to eq(true)
+      @keyserver.delete_key(@generated_keys[0])
+      expect(@keyserver.invalid_key?(@generated_keys[0])).to eq(true)
     end
   end
 
